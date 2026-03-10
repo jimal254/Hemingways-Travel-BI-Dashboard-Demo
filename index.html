@@ -1,273 +1,249 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Hemingways Travel · BI Dashboard</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.development.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.development.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/recharts/2.1.9/Recharts.js"></script>
-  <style>
-    *{margin:0;padding:0;box-sizing:border-box;}
-    body{background:#0A1628;font-family:'Segoe UI',sans-serif;color:#fff;}
-    @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
-  </style>
-</head>
-<body>
-<div id="root"></div>
-<script type="text/babel">
+import { useState, useEffect, useRef } from "react";
+import { AreaChart, Area, BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from "recharts";
 
-const { useState, useEffect, useRef } = React;
-const {
-  AreaChart, Area, BarChart, Bar, LineChart, Line,
-  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell, Legend
-} = Recharts;
+const gold = "#C9A84C";
+const navy = "#0A1628";
+const lightNavy = "#0F1F3D";
+const cardBg = "#111827";
+const border = "#1E3A5F";
+const textMuted = "#94A3B8";
+const green = "#22C55E";
+const red = "#EF4444";
 
-const gold="#C9A84C",navy="#0A1628",lightNavy="#0F1F3D";
-const cardBg="#111827",border="#1E3A5F",textMuted="#94A3B8";
-const green="#22C55E",red="#EF4444";
-
-const revenueData=[
-  {month:"Jan",before:210,after:220},{month:"Feb",before:195,after:218},
-  {month:"Mar",before:230,after:265},{month:"Apr",before:215,after:252},
-  {month:"May",before:240,after:285},{month:"Jun",before:260,after:310},
-  {month:"Jul",before:275,after:330},{month:"Aug",before:255,after:308},
-  {month:"Sep",before:235,after:278},{month:"Oct",before:245,after:291},
-  {month:"Nov",before:268,after:315},{month:"Dec",before:290,after:342},
+const revenueData = [
+  { month:"Jan", before:210, after:220 },{ month:"Feb", before:195, after:218 },
+  { month:"Mar", before:230, after:265 },{ month:"Apr", before:215, after:252 },
+  { month:"May", before:240, after:285 },{ month:"Jun", before:260, after:310 },
+  { month:"Jul", before:275, after:330 },{ month:"Aug", before:255, after:308 },
+  { month:"Sep", before:235, after:278 },{ month:"Oct", before:245, after:291 },
+  { month:"Nov", before:268, after:315 },{ month:"Dec", before:290, after:342 },
 ];
 
-const cancellationData=[
-  {month:"Jan",rate:18},{month:"Feb",rate:17},{month:"Mar",rate:15},
-  {month:"Apr",rate:13},{month:"May",rate:12},{month:"Jun",rate:11},
-  {month:"Jul",rate:10},{month:"Aug",rate:10},{month:"Sep",rate:9},
-  {month:"Oct",rate:8},{month:"Nov",rate:8},{month:"Dec",rate:7},
+const cancellationData = [
+  { month:"Jan", rate:18 },{ month:"Feb", rate:17 },{ month:"Mar", rate:15 },
+  { month:"Apr", rate:13 },{ month:"May", rate:12 },{ month:"Jun", rate:11 },
+  { month:"Jul", rate:10 },{ month:"Aug", rate:10 },{ month:"Sep", rate:9 },
+  { month:"Oct", rate:8 },{ month:"Nov", rate:8 },{ month:"Dec", rate:7 },
 ];
 
-const bookingChannels=[
-  {name:"Direct Web",value:38},{name:"Travel Agents",value:27},
-  {name:"Corporate",value:20},{name:"Referrals",value:15},
+const bookingChannels = [
+  { name:"Direct Web", value:38 },{ name:"Travel Agents", value:27 },
+  { name:"Corporate", value:20 },{ name:"Referrals", value:15 },
 ];
-const channelColors=[gold,"#3B82F6","#8B5CF6","#06B6D4"];
+const channelColors = [gold, "#3B82F6", "#8B5CF6", "#06B6D4"];
 
-const customerSegments=[
-  {segment:"Leisure",bookings:420,revenue:185},
-  {segment:"Corporate",bookings:310,revenue:248},
-  {segment:"Group",bookings:180,revenue:142},
-  {segment:"Honeymoon",bookings:95,revenue:118},
-];
-
-const kpis=[
-  {label:"Revenue Growth",target:12,suffix:"%",prefix:"+",color:green,icon:"📈"},
-  {label:"Cancellation Drop",target:20,suffix:"%",prefix:"-",color:red,icon:"📉"},
-  {label:"Reporting Time Saved",target:65,suffix:"%",prefix:"-",color:gold,icon:"⚡"},
-  {label:"Data Accuracy",target:99.2,suffix:"%",prefix:"",color:"#3B82F6",icon:"✅"},
+const customerSegments = [
+  { segment:"Leisure", bookings:420, revenue:185 },
+  { segment:"Corporate", bookings:310, revenue:248 },
+  { segment:"Group", bookings:180, revenue:142 },
+  { segment:"Honeymoon", bookings:95, revenue:118 },
 ];
 
-const tabs=["overview","revenue","cancellations","segments"];
-const tabDurations=[6000,6000,5000,6000];
-const headlines=[
+const kpis = [
+  { label:"Revenue Growth", target:12, suffix:"%", prefix:"+", color: green, icon:"📈" },
+  { label:"Cancellation Drop", target:20, suffix:"%", prefix:"-", color: red, icon:"📉" },
+  { label:"Reporting Time Saved", target:65, suffix:"%", prefix:"-", color: gold, icon:"⚡" },
+  { label:"Data Accuracy", target:99.2, suffix:"%", prefix:"", color: "#3B82F6", icon:"✅" },
+];
+
+const tabs = ["overview", "revenue", "cancellations", "segments"];
+const tabDurations = [6000, 6000, 5000, 6000]; // ms per tab
+
+function useCountUp(target, active, duration = 1800) {
+  const [val, setVal] = useState(0);
+  useEffect(() => {
+    if (!active) { setVal(0); return; }
+    let start = null;
+    const step = (ts) => {
+      if (!start) start = ts;
+      const p = Math.min((ts - start) / duration, 1);
+      setVal(parseFloat((p * target).toFixed(1)));
+      if (p < 1) requestAnimationFrame(step);
+      else setVal(target);
+    };
+    requestAnimationFrame(step);
+  }, [active, target]);
+  return val;
+}
+
+const KPICard = ({ label, target, suffix, prefix, color, icon, active }) => {
+  const val = useCountUp(target, active);
+  return (
+    <div style={{
+      background: cardBg, border: `1px solid ${border}`, borderRadius: 12,
+      padding: "18px 20px", borderTop: `3px solid ${color}`, flex: 1, minWidth: 150,
+      transition: "transform 0.4s, box-shadow 0.4s",
+      transform: active ? "translateY(-4px)" : "translateY(0)",
+      boxShadow: active ? `0 8px 24px ${color}33` : "none"
+    }}>
+      <div style={{ fontSize: 22, marginBottom: 4 }}>{icon}</div>
+      <div style={{ fontSize: 26, fontWeight: 700, color, fontFamily: "monospace" }}>
+        {prefix}{val}{suffix}
+      </div>
+      <div style={{ fontSize: 12, color: "#fff", fontWeight: 600, marginTop: 4 }}>{label}</div>
+    </div>
+  );
+};
+
+const Panel = ({ children, style = {}, visible }) => (
+  <div style={{
+    background: cardBg, border: `1px solid ${border}`, borderRadius: 12, padding: 20,
+    opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(20px)",
+    transition: "opacity 0.6s ease, transform 0.6s ease", ...style
+  }}>
+    {children}
+  </div>
+);
+
+const SectionTitle = ({ title, sub }) => (
+  <div style={{ marginBottom: 12 }}>
+    <div style={{ fontSize: 12, fontWeight: 700, color: gold, letterSpacing: 1, textTransform: "uppercase" }}>{title}</div>
+    {sub && <div style={{ fontSize: 11, color: textMuted, marginTop: 2 }}>{sub}</div>}
+  </div>
+);
+
+const CustomTooltip = ({ active, payload, label }) => {
+  if (!active || !payload?.length) return null;
+  return (
+    <div style={{ background: lightNavy, border: `1px solid ${border}`, borderRadius: 8, padding: "8px 12px", fontSize: 11 }}>
+      <div style={{ color: gold, fontWeight: 700, marginBottom: 3 }}>{label}</div>
+      {payload.map((p, i) => (
+        <div key={i} style={{ color: p.color }}>
+          {p.name}: <strong>{typeof p.value === "number" && p.name !== "rate" ? `$${p.value}K` : `${p.value}${p.name === "rate" ? "%" : ""}`}</strong>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+// Typing headline per tab
+const headlines = [
   "Dashboard Overview — FY 2024 Performance",
   "Revenue Trend — +12% Growth After BI Implementation",
   "Cancellation Analysis — 20% Drop Achieved",
   "Customer Segments — Bookings & Revenue Breakdown",
 ];
 
-function useCountUp(target,active,duration=1800){
-  const [val,setVal]=useState(0);
-  useEffect(()=>{
-    if(!active){setVal(0);return;}
-    let start=null;
-    const step=(ts)=>{
-      if(!start)start=ts;
-      const p=Math.min((ts-start)/duration,1);
-      setVal(parseFloat((p*target).toFixed(1)));
-      if(p<1)requestAnimationFrame(step);
-      else setVal(target);
-    };
-    requestAnimationFrame(step);
-  },[active,target]);
-  return val;
+function TypingText({ text, active }) {
+  const [displayed, setDisplayed] = useState("");
+  useEffect(() => {
+    if (!active) { setDisplayed(""); return; }
+    let i = 0;
+    setDisplayed("");
+    const iv = setInterval(() => {
+      i++;
+      setDisplayed(text.slice(0, i));
+      if (i >= text.length) clearInterval(iv);
+    }, 35);
+    return () => clearInterval(iv);
+  }, [active, text]);
+  return <span>{displayed}<span style={{ opacity: 0.6 }}>|</span></span>;
 }
 
-function KPICard({label,target,suffix,prefix,color,icon,active}){
-  const val=useCountUp(target,active);
-  return(
-    <div style={{background:cardBg,border:`1px solid ${border}`,borderRadius:12,
-      padding:"18px 20px",borderTop:`3px solid ${color}`,flex:1,minWidth:140,
-      transition:"transform 0.4s,box-shadow 0.4s",
-      transform:active?"translateY(-4px)":"translateY(0)",
-      boxShadow:active?`0 8px 24px ${color}33`:"none"}}>
-      <div style={{fontSize:22,marginBottom:4}}>{icon}</div>
-      <div style={{fontSize:26,fontWeight:700,color,fontFamily:"monospace"}}>
-        {prefix}{val}{suffix}
-      </div>
-      <div style={{fontSize:12,color:"#fff",fontWeight:600,marginTop:4}}>{label}</div>
-    </div>
-  );
-}
-
-function Panel({children,style={},visible}){
-  return(
-    <div style={{background:cardBg,border:`1px solid ${border}`,borderRadius:12,padding:20,
-      opacity:visible?1:0,transform:visible?"translateY(0)":"translateY(20px)",
-      transition:"opacity 0.6s ease,transform 0.6s ease",...style}}>
-      {children}
-    </div>
-  );
-}
-
-function SectionTitle({title,sub}){
-  return(
-    <div style={{marginBottom:12}}>
-      <div style={{fontSize:12,fontWeight:700,color:gold,letterSpacing:1,textTransform:"uppercase"}}>{title}</div>
-      {sub&&<div style={{fontSize:11,color:textMuted,marginTop:2}}>{sub}</div>}
-    </div>
-  );
-}
-
-function CustomTooltip({active,payload,label}){
-  if(!active||!payload||!payload.length)return null;
-  return(
-    <div style={{background:lightNavy,border:`1px solid ${border}`,borderRadius:8,padding:"8px 12px",fontSize:11}}>
-      <div style={{color:gold,fontWeight:700,marginBottom:3}}>{label}</div>
-      {payload.map((p,i)=>(
-        <div key={i} style={{color:p.color}}>
-          {p.name}: <strong>{typeof p.value==="number"&&p.name!=="rate"?`$${p.value}K`:`${p.value}${p.name==="rate"?"%":""}`}</strong>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function TypingText({text,active}){
-  const [displayed,setDisplayed]=useState("");
-  useEffect(()=>{
-    if(!active){setDisplayed("");return;}
-    let i=0;setDisplayed("");
-    const iv=setInterval(()=>{
-      i++;setDisplayed(text.slice(0,i));
-      if(i>=text.length)clearInterval(iv);
-    },35);
-    return()=>clearInterval(iv);
-  },[active,text]);
-  return React.createElement(React.Fragment,null,displayed,
-    React.createElement("span",{style:{opacity:0.6}},"|")
-  );
-}
-
-function TabTimer({duration,active,onComplete}){
-  const [progress,setProgress]=useState(0);
-  const startRef=useRef(null),rafRef=useRef(null);
-  useEffect(()=>{
-    if(!active){setProgress(0);return;}
-    startRef.current=null;
-    const step=(ts)=>{
-      if(!startRef.current)startRef.current=ts;
-      const p=Math.min((ts-startRef.current)/duration,1);
-      setProgress(p*100);
-      if(p<1)rafRef.current=requestAnimationFrame(step);
+// Progress bar for tab timer
+function TabTimer({ duration, active, onComplete }) {
+  const [progress, setProgress] = useState(0);
+  const start = useRef(null);
+  const raf = useRef(null);
+  useEffect(() => {
+    if (!active) { setProgress(0); return; }
+    start.current = null;
+    const step = (ts) => {
+      if (!start.current) start.current = ts;
+      const p = Math.min((ts - start.current) / duration, 1);
+      setProgress(p * 100);
+      if (p < 1) raf.current = requestAnimationFrame(step);
       else onComplete();
     };
-    rafRef.current=requestAnimationFrame(step);
-    return()=>cancelAnimationFrame(rafRef.current);
-  },[active,duration]);
-  return(
-    <div style={{height:2,background:border,borderRadius:2,overflow:"hidden",marginTop:8}}>
-      <div style={{height:"100%",width:`${progress}%`,background:gold,borderRadius:2}}/>
+    raf.current = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(raf.current);
+  }, [active, duration]);
+  return (
+    <div style={{ height: 2, background: border, borderRadius: 2, overflow: "hidden", marginTop: 8 }}>
+      <div style={{ height: "100%", width: `${progress}%`, background: gold, transition: "width 0.1s linear", borderRadius: 2 }} />
     </div>
   );
 }
 
-function Dashboard(){
-  const [tabIdx,setTabIdx]=useState(0);
-  const [visible,setVisible]=useState(true);
-  const [playing,setPlaying]=useState(true);
-  const [kpiActive,setKpiActive]=useState(false);
+export default function Dashboard() {
+  const [tabIdx, setTabIdx] = useState(0);
+  const [visible, setVisible] = useState(true);
+  const [playing, setPlaying] = useState(true);
+  const [kpiActive, setKpiActive] = useState(false);
 
-  useEffect(()=>{setTimeout(()=>setKpiActive(true),400);},[]);
+  useEffect(() => { setTimeout(() => setKpiActive(true), 400); }, []);
 
-  function goToTab(i){
+  const goToTab = (i) => {
     setVisible(false);
-    setTimeout(()=>{
-      setTabIdx(i);setVisible(true);
-      setKpiActive(false);
-      setTimeout(()=>setKpiActive(true),300);
-    },400);
-  }
+    setTimeout(() => { setTabIdx(i); setVisible(true); setKpiActive(false); setTimeout(() => setKpiActive(true), 300); }, 400);
+  };
 
-  function nextTab(){
-    if(!playing)return;
-    goToTab((tabIdx+1)%tabs.length);
-  }
+  const nextTab = () => {
+    if (!playing) return;
+    goToTab((tabIdx + 1) % tabs.length);
+  };
 
-  return(
-    <div style={{background:navy,minHeight:"100vh",color:"#fff"}}>
-
+  return (
+    <div style={{ background: navy, minHeight: "100vh", fontFamily: "'Segoe UI', sans-serif", color: "#fff" }}>
       {/* Header */}
-      <div style={{background:lightNavy,borderBottom:`1px solid ${border}`,padding:"14px 24px",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+      <div style={{ background: lightNavy, borderBottom: `1px solid ${border}`, padding: "14px 24px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div>
-          <div style={{fontSize:17,fontWeight:700,color:gold}}>✈ Hemingways Travel · BI Dashboard</div>
-          <div style={{fontSize:10,color:textMuted,marginTop:1}}>FY 2024 · Power BI · Azure Synapse · ETL Pipelines</div>
+          <div style={{ fontSize: 17, fontWeight: 700, color: gold }}>✈ Hemingways Travel · BI Dashboard</div>
+          <div style={{ fontSize: 10, color: textMuted, marginTop: 1 }}>FY 2024 · Power BI · Azure Synapse · ETL Pipelines</div>
         </div>
-        <div style={{display:"flex",gap:10,alignItems:"center"}}>
-          <div style={{width:7,height:7,borderRadius:"50%",background:green,boxShadow:`0 0 8px ${green}`,animation:"pulse 1.5s infinite"}}/>
-          <div style={{fontSize:10,color:green,fontWeight:600}}>LIVE</div>
-          <button onClick={()=>setPlaying(p=>!p)}
-            style={{background:playing?gold:border,color:playing?navy:"#fff",border:"none",
-              borderRadius:6,padding:"5px 14px",fontSize:11,fontWeight:700,cursor:"pointer",marginLeft:8}}>
-            {playing?"⏸ Pause":"▶ Play"}
-          </button>
+        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+          <div style={{ width: 7, height: 7, borderRadius: "50%", background: green, boxShadow: `0 0 8px ${green}`, animation: "pulse 1.5s infinite" }} />
+          <div style={{ fontSize: 10, color: green, fontWeight: 600 }}>LIVE</div>
+          <button onClick={() => setPlaying(p => !p)} style={{
+            background: playing ? gold : border, color: playing ? navy : "#fff",
+            border: "none", borderRadius: 6, padding: "5px 14px", fontSize: 11,
+            fontWeight: 700, cursor: "pointer", marginLeft: 8
+          }}>{playing ? "⏸ Pause" : "▶ Play"}</button>
         </div>
       </div>
 
-      {/* Headline */}
-      <div style={{padding:"14px 24px 0",fontSize:14,fontWeight:600,color:"#fff",minHeight:28}}>
-        <TypingText text={headlines[tabIdx]} active={visible}/>
+      {/* Typing headline */}
+      <div style={{ padding: "14px 24px 0", fontSize: 14, fontWeight: 600, color: "#fff", minHeight: 24 }}>
+        <TypingText text={headlines[tabIdx]} active={visible} />
       </div>
 
-      {/* Tabs */}
-      <div style={{display:"flex",gap:4,padding:"10px 24px 0"}}>
-        {tabs.map((t,i)=>(
-          <div key={t} style={{flex:1}}>
-            <button onClick={()=>{setPlaying(false);goToTab(i);}}
-              style={{width:"100%",background:tabIdx===i?gold:"transparent",
-                color:tabIdx===i?navy:textMuted,
-                border:`1px solid ${tabIdx===i?gold:border}`,
-                borderRadius:"8px 8px 0 0",padding:"7px 0",
-                fontSize:11,fontWeight:700,cursor:"pointer",textTransform:"capitalize"}}>
-              {t}
-            </button>
-            {tabIdx===i&&playing&&
-              <TabTimer duration={tabDurations[i]} active={tabIdx===i&&playing} onComplete={nextTab}/>
-            }
+      {/* Tab bar */}
+      <div style={{ display: "flex", gap: 4, padding: "10px 24px 0" }}>
+        {tabs.map((t, i) => (
+          <div key={t} style={{ flex: 1 }}>
+            <button onClick={() => { setPlaying(false); goToTab(i); }} style={{
+              width: "100%", background: tabIdx === i ? gold : "transparent",
+              color: tabIdx === i ? navy : textMuted,
+              border: `1px solid ${tabIdx === i ? gold : border}`,
+              borderRadius: "8px 8px 0 0", padding: "7px 0",
+              fontSize: 11, fontWeight: 700, cursor: "pointer", textTransform: "capitalize"
+            }}>{t}</button>
+            {tabIdx === i && playing && (
+              <TabTimer duration={tabDurations[i]} active={tabIdx === i && playing} onComplete={nextTab} />
+            )}
           </div>
         ))}
       </div>
 
-      <div style={{padding:"20px 24px"}}>
-
-        {/* KPIs */}
-        <div style={{display:"flex",gap:10,marginBottom:20,flexWrap:"wrap"}}>
-          {kpis.map((k,i)=><KPICard key={i} {...k} active={kpiActive}/>)}
+      <div style={{ padding: "20px 24px" }}>
+        {/* KPI Row */}
+        <div style={{ display: "flex", gap: 10, marginBottom: 20, flexWrap: "wrap" }}>
+          {kpis.map((k, i) => <KPICard key={i} {...k} active={kpiActive} />)}
         </div>
 
         {/* OVERVIEW */}
-        {tabIdx===0&&(
-          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16}}>
+        {tabIdx === 0 && (
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
             <Panel visible={visible}>
-              <SectionTitle title="Revenue Trend" sub="Before vs After BI ($K)"/>
+              <SectionTitle title="Revenue Trend" sub="Before vs After BI ($K)" />
               <ResponsiveContainer width="100%" height={200}>
                 <AreaChart data={revenueData}>
                   <defs>
                     <linearGradient id="gA" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor={gold} stopOpacity={0.3}/>
-                      <stop offset="95%" stopColor={gold} stopOpacity={0}/>
+                      <stop offset="5%" stopColor={gold} stopOpacity={0.3}/><stop offset="95%" stopColor={gold} stopOpacity={0}/>
                     </linearGradient>
                     <linearGradient id="gB" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.2}/>
-                      <stop offset="95%" stopColor="#3B82F6" stopOpacity={0}/>
+                      <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.2}/><stop offset="95%" stopColor="#3B82F6" stopOpacity={0}/>
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke={border}/>
@@ -320,19 +296,17 @@ function Dashboard(){
         )}
 
         {/* REVENUE */}
-        {tabIdx===1&&(
+        {tabIdx === 1 && (
           <Panel visible={visible}>
             <SectionTitle title="Full-Year Revenue Analysis" sub="Before vs After BI Implementation ($K)"/>
             <ResponsiveContainer width="100%" height={340}>
               <AreaChart data={revenueData}>
                 <defs>
                   <linearGradient id="gA2" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor={gold} stopOpacity={0.35}/>
-                    <stop offset="95%" stopColor={gold} stopOpacity={0}/>
+                    <stop offset="5%" stopColor={gold} stopOpacity={0.35}/><stop offset="95%" stopColor={gold} stopOpacity={0}/>
                   </linearGradient>
                   <linearGradient id="gB2" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.2}/>
-                    <stop offset="95%" stopColor="#3B82F6" stopOpacity={0}/>
+                    <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.2}/><stop offset="95%" stopColor="#3B82F6" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke={border}/>
@@ -356,7 +330,7 @@ function Dashboard(){
         )}
 
         {/* CANCELLATIONS */}
-        {tabIdx===2&&(
+        {tabIdx === 2 && (
           <Panel visible={visible}>
             <SectionTitle title="Cancellation Rate Reduction" sub="Monthly cancellation % — pricing & marketing strategy adjustments"/>
             <ResponsiveContainer width="100%" height={320}>
@@ -381,7 +355,7 @@ function Dashboard(){
         )}
 
         {/* SEGMENTS */}
-        {tabIdx===3&&(
+        {tabIdx === 3 && (
           <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16}}>
             <Panel visible={visible}>
               <SectionTitle title="Bookings by Segment" sub="Volume by customer type"/>
@@ -417,11 +391,7 @@ function Dashboard(){
         <div style={{fontSize:10,color:gold}}>Jimmy Maina · jimal254.github.io</div>
       </div>
 
+      <style>{`@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }`}</style>
     </div>
   );
 }
-
-ReactDOM.render(React.createElement(Dashboard,null), document.getElementById('root'));
-</script>
-</body>
-  </html>
