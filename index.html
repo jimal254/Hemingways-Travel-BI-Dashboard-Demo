@@ -1,386 +1,427 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Hemingways Travel · BI Dashboard</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.development.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.development.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/recharts/2.8.0/Recharts.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/recharts/2.1.9/Recharts.js"></script>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { background: #0A1628; font-family: 'Segoe UI', sans-serif; }
-    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{background:#0A1628;font-family:'Segoe UI',sans-serif;color:#fff;}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
   </style>
 </head>
 <body>
-  <div id="root"></div>
-  <script type="text/babel">
-    const { useState, useEffect, useRef } = React;
-    const { AreaChart, Area, BarChart, Bar, LineChart, Line,
-            XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-            PieChart, Pie, Cell, Legend } = Recharts;
+<div id="root"></div>
+<script type="text/babel">
 
-    const gold = "#C9A84C", navy = "#0A1628", lightNavy = "#0F1F3D";
-    const cardBg = "#111827", border = "#1E3A5F", textMuted = "#94A3B8";
-    const green = "#22C55E", red = "#EF4444";
+const { useState, useEffect, useRef } = React;
+const {
+  AreaChart, Area, BarChart, Bar, LineChart, Line,
+  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  PieChart, Pie, Cell, Legend
+} = Recharts;
 
-    const revenueData = [
-      {month:"Jan",before:210,after:220},{month:"Feb",before:195,after:218},
-      {month:"Mar",before:230,after:265},{month:"Apr",before:215,after:252},
-      {month:"May",before:240,after:285},{month:"Jun",before:260,after:310},
-      {month:"Jul",before:275,after:330},{month:"Aug",before:255,after:308},
-      {month:"Sep",before:235,after:278},{month:"Oct",before:245,after:291},
-      {month:"Nov",before:268,after:315},{month:"Dec",before:290,after:342},
-    ];
+const gold="#C9A84C",navy="#0A1628",lightNavy="#0F1F3D";
+const cardBg="#111827",border="#1E3A5F",textMuted="#94A3B8";
+const green="#22C55E",red="#EF4444";
 
-    const cancellationData = [
-      {month:"Jan",rate:18},{month:"Feb",rate:17},{month:"Mar",rate:15},
-      {month:"Apr",rate:13},{month:"May",rate:12},{month:"Jun",rate:11},
-      {month:"Jul",rate:10},{month:"Aug",rate:10},{month:"Sep",rate:9},
-      {month:"Oct",rate:8},{month:"Nov",rate:8},{month:"Dec",rate:7},
-    ];
+const revenueData=[
+  {month:"Jan",before:210,after:220},{month:"Feb",before:195,after:218},
+  {month:"Mar",before:230,after:265},{month:"Apr",before:215,after:252},
+  {month:"May",before:240,after:285},{month:"Jun",before:260,after:310},
+  {month:"Jul",before:275,after:330},{month:"Aug",before:255,after:308},
+  {month:"Sep",before:235,after:278},{month:"Oct",before:245,after:291},
+  {month:"Nov",before:268,after:315},{month:"Dec",before:290,after:342},
+];
 
-    const bookingChannels = [
-      {name:"Direct Web",value:38},{name:"Travel Agents",value:27},
-      {name:"Corporate",value:20},{name:"Referrals",value:15},
-    ];
-    const channelColors = [gold,"#3B82F6","#8B5CF6","#06B6D4"];
+const cancellationData=[
+  {month:"Jan",rate:18},{month:"Feb",rate:17},{month:"Mar",rate:15},
+  {month:"Apr",rate:13},{month:"May",rate:12},{month:"Jun",rate:11},
+  {month:"Jul",rate:10},{month:"Aug",rate:10},{month:"Sep",rate:9},
+  {month:"Oct",rate:8},{month:"Nov",rate:8},{month:"Dec",rate:7},
+];
 
-    const customerSegments = [
-      {segment:"Leisure",bookings:420,revenue:185},
-      {segment:"Corporate",bookings:310,revenue:248},
-      {segment:"Group",bookings:180,revenue:142},
-      {segment:"Honeymoon",bookings:95,revenue:118},
-    ];
+const bookingChannels=[
+  {name:"Direct Web",value:38},{name:"Travel Agents",value:27},
+  {name:"Corporate",value:20},{name:"Referrals",value:15},
+];
+const channelColors=[gold,"#3B82F6","#8B5CF6","#06B6D4"];
 
-    const kpis = [
-      {label:"Revenue Growth",target:12,suffix:"%",prefix:"+",color:green,icon:"📈"},
-      {label:"Cancellation Drop",target:20,suffix:"%",prefix:"-",color:red,icon:"📉"},
-      {label:"Reporting Time Saved",target:65,suffix:"%",prefix:"-",color:gold,icon:"⚡"},
-      {label:"Data Accuracy",target:99.2,suffix:"%",prefix:"",color:"#3B82F6",icon:"✅"},
-    ];
+const customerSegments=[
+  {segment:"Leisure",bookings:420,revenue:185},
+  {segment:"Corporate",bookings:310,revenue:248},
+  {segment:"Group",bookings:180,revenue:142},
+  {segment:"Honeymoon",bookings:95,revenue:118},
+];
 
-    const tabs = ["overview","revenue","cancellations","segments"];
-    const tabDurations = [6000,6000,5000,6000];
-    const headlines = [
-      "Dashboard Overview — FY 2024 Performance",
-      "Revenue Trend — +12% Growth After BI Implementation",
-      "Cancellation Analysis — 20% Drop Achieved",
-      "Customer Segments — Bookings & Revenue Breakdown",
-    ];
+const kpis=[
+  {label:"Revenue Growth",target:12,suffix:"%",prefix:"+",color:green,icon:"📈"},
+  {label:"Cancellation Drop",target:20,suffix:"%",prefix:"-",color:red,icon:"📉"},
+  {label:"Reporting Time Saved",target:65,suffix:"%",prefix:"-",color:gold,icon:"⚡"},
+  {label:"Data Accuracy",target:99.2,suffix:"%",prefix:"",color:"#3B82F6",icon:"✅"},
+];
 
-    function useCountUp(target, active, duration=1800) {
-      const [val, setVal] = useState(0);
-      useEffect(() => {
-        if (!active){setVal(0);return;}
-        let start=null;
-        const step=(ts)=>{
-          if(!start)start=ts;
-          const p=Math.min((ts-start)/duration,1);
-          setVal(parseFloat((p*target).toFixed(1)));
-          if(p<1)requestAnimationFrame(step);
-          else setVal(target);
-        };
-        requestAnimationFrame(step);
-      },[active,target]);
-      return val;
-    }
+const tabs=["overview","revenue","cancellations","segments"];
+const tabDurations=[6000,6000,5000,6000];
+const headlines=[
+  "Dashboard Overview — FY 2024 Performance",
+  "Revenue Trend — +12% Growth After BI Implementation",
+  "Cancellation Analysis — 20% Drop Achieved",
+  "Customer Segments — Bookings & Revenue Breakdown",
+];
 
-    const KPICard=({label,target,suffix,prefix,color,icon,active})=>{
-      const val=useCountUp(target,active);
-      return(
-        <div style={{background:cardBg,border:`1px solid ${border}`,borderRadius:12,
-          padding:"18px 20px",borderTop:`3px solid ${color}`,flex:1,minWidth:150,
-          transition:"transform 0.4s,box-shadow 0.4s",
-          transform:active?"translateY(-4px)":"translateY(0)",
-          boxShadow:active?`0 8px 24px ${color}33`:"none"}}>
-          <div style={{fontSize:22,marginBottom:4}}>{icon}</div>
-          <div style={{fontSize:26,fontWeight:700,color,fontFamily:"monospace"}}>
-            {prefix}{val}{suffix}
-          </div>
-          <div style={{fontSize:12,color:"#fff",fontWeight:600,marginTop:4}}>{label}</div>
-        </div>
-      );
+function useCountUp(target,active,duration=1800){
+  const [val,setVal]=useState(0);
+  useEffect(()=>{
+    if(!active){setVal(0);return;}
+    let start=null;
+    const step=(ts)=>{
+      if(!start)start=ts;
+      const p=Math.min((ts-start)/duration,1);
+      setVal(parseFloat((p*target).toFixed(1)));
+      if(p<1)requestAnimationFrame(step);
+      else setVal(target);
     };
+    requestAnimationFrame(step);
+  },[active,target]);
+  return val;
+}
 
-    const Panel=({children,style={},visible})=>(
-      <div style={{background:cardBg,border:`1px solid ${border}`,borderRadius:12,padding:20,
-        opacity:visible?1:0,transform:visible?"translateY(0)":"translateY(20px)",
-        transition:"opacity 0.6s ease,transform 0.6s ease",...style}}>
-        {children}
+function KPICard({label,target,suffix,prefix,color,icon,active}){
+  const val=useCountUp(target,active);
+  return(
+    <div style={{background:cardBg,border:`1px solid ${border}`,borderRadius:12,
+      padding:"18px 20px",borderTop:`3px solid ${color}`,flex:1,minWidth:140,
+      transition:"transform 0.4s,box-shadow 0.4s",
+      transform:active?"translateY(-4px)":"translateY(0)",
+      boxShadow:active?`0 8px 24px ${color}33`:"none"}}>
+      <div style={{fontSize:22,marginBottom:4}}>{icon}</div>
+      <div style={{fontSize:26,fontWeight:700,color,fontFamily:"monospace"}}>
+        {prefix}{val}{suffix}
       </div>
-    );
+      <div style={{fontSize:12,color:"#fff",fontWeight:600,marginTop:4}}>{label}</div>
+    </div>
+  );
+}
 
-    const SectionTitle=({title,sub})=>(
-      <div style={{marginBottom:12}}>
-        <div style={{fontSize:12,fontWeight:700,color:gold,letterSpacing:1,textTransform:"uppercase"}}>{title}</div>
-        {sub&&<div style={{fontSize:11,color:textMuted,marginTop:2}}>{sub}</div>}
-      </div>
-    );
+function Panel({children,style={},visible}){
+  return(
+    <div style={{background:cardBg,border:`1px solid ${border}`,borderRadius:12,padding:20,
+      opacity:visible?1:0,transform:visible?"translateY(0)":"translateY(20px)",
+      transition:"opacity 0.6s ease,transform 0.6s ease",...style}}>
+      {children}
+    </div>
+  );
+}
 
-    const CustomTooltip=({active,payload,label})=>{
-      if(!active||!payload?.length)return null;
-      return(
-        <div style={{background:lightNavy,border:`1px solid ${border}`,borderRadius:8,padding:"8px 12px",fontSize:11}}>
-          <div style={{color:gold,fontWeight:700,marginBottom:3}}>{label}</div>
-          {payload.map((p,i)=>(
-            <div key={i} style={{color:p.color}}>
-              {p.name}: <strong>{typeof p.value==="number"&&p.name!=="rate"?`$${p.value}K`:`${p.value}${p.name==="rate"?"%":""}`}</strong>
-            </div>
-          ))}
+function SectionTitle({title,sub}){
+  return(
+    <div style={{marginBottom:12}}>
+      <div style={{fontSize:12,fontWeight:700,color:gold,letterSpacing:1,textTransform:"uppercase"}}>{title}</div>
+      {sub&&<div style={{fontSize:11,color:textMuted,marginTop:2}}>{sub}</div>}
+    </div>
+  );
+}
+
+function CustomTooltip({active,payload,label}){
+  if(!active||!payload||!payload.length)return null;
+  return(
+    <div style={{background:lightNavy,border:`1px solid ${border}`,borderRadius:8,padding:"8px 12px",fontSize:11}}>
+      <div style={{color:gold,fontWeight:700,marginBottom:3}}>{label}</div>
+      {payload.map((p,i)=>(
+        <div key={i} style={{color:p.color}}>
+          {p.name}: <strong>{typeof p.value==="number"&&p.name!=="rate"?`$${p.value}K`:`${p.value}${p.name==="rate"?"%":""}`}</strong>
         </div>
-      );
+      ))}
+    </div>
+  );
+}
+
+function TypingText({text,active}){
+  const [displayed,setDisplayed]=useState("");
+  useEffect(()=>{
+    if(!active){setDisplayed("");return;}
+    let i=0;setDisplayed("");
+    const iv=setInterval(()=>{
+      i++;setDisplayed(text.slice(0,i));
+      if(i>=text.length)clearInterval(iv);
+    },35);
+    return()=>clearInterval(iv);
+  },[active,text]);
+  return React.createElement(React.Fragment,null,displayed,
+    React.createElement("span",{style:{opacity:0.6}},"|")
+  );
+}
+
+function TabTimer({duration,active,onComplete}){
+  const [progress,setProgress]=useState(0);
+  const startRef=useRef(null),rafRef=useRef(null);
+  useEffect(()=>{
+    if(!active){setProgress(0);return;}
+    startRef.current=null;
+    const step=(ts)=>{
+      if(!startRef.current)startRef.current=ts;
+      const p=Math.min((ts-startRef.current)/duration,1);
+      setProgress(p*100);
+      if(p<1)rafRef.current=requestAnimationFrame(step);
+      else onComplete();
     };
+    rafRef.current=requestAnimationFrame(step);
+    return()=>cancelAnimationFrame(rafRef.current);
+  },[active,duration]);
+  return(
+    <div style={{height:2,background:border,borderRadius:2,overflow:"hidden",marginTop:8}}>
+      <div style={{height:"100%",width:`${progress}%`,background:gold,borderRadius:2}}/>
+    </div>
+  );
+}
 
-    function TypingText({text,active}){
-      const [displayed,setDisplayed]=useState("");
-      useEffect(()=>{
-        if(!active){setDisplayed("");return;}
-        let i=0; setDisplayed("");
-        const iv=setInterval(()=>{
-          i++; setDisplayed(text.slice(0,i));
-          if(i>=text.length)clearInterval(iv);
-        },35);
-        return()=>clearInterval(iv);
-      },[active,text]);
-      return <span>{displayed}<span style={{opacity:0.6}}>|</span></span>;
-    }
+function Dashboard(){
+  const [tabIdx,setTabIdx]=useState(0);
+  const [visible,setVisible]=useState(true);
+  const [playing,setPlaying]=useState(true);
+  const [kpiActive,setKpiActive]=useState(false);
 
-    function TabTimer({duration,active,onComplete}){
-      const [progress,setProgress]=useState(0);
-      const start=useRef(null), raf=useRef(null);
-      useEffect(()=>{
-        if(!active){setProgress(0);return;}
-        start.current=null;
-        const step=(ts)=>{
-          if(!start.current)start.current=ts;
-          const p=Math.min((ts-start.current)/duration,1);
-          setProgress(p*100);
-          if(p<1)raf.current=requestAnimationFrame(step);
-          else onComplete();
-        };
-        raf.current=requestAnimationFrame(step);
-        return()=>cancelAnimationFrame(raf.current);
-      },[active,duration]);
-      return(
-        <div style={{height:2,background:border,borderRadius:2,overflow:"hidden",marginTop:8}}>
-          <div style={{height:"100%",width:`${progress}%`,background:gold,transition:"width 0.1s linear",borderRadius:2}}/>
+  useEffect(()=>{setTimeout(()=>setKpiActive(true),400);},[]);
+
+  function goToTab(i){
+    setVisible(false);
+    setTimeout(()=>{
+      setTabIdx(i);setVisible(true);
+      setKpiActive(false);
+      setTimeout(()=>setKpiActive(true),300);
+    },400);
+  }
+
+  function nextTab(){
+    if(!playing)return;
+    goToTab((tabIdx+1)%tabs.length);
+  }
+
+  return(
+    <div style={{background:navy,minHeight:"100vh",color:"#fff"}}>
+
+      {/* Header */}
+      <div style={{background:lightNavy,borderBottom:`1px solid ${border}`,padding:"14px 24px",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+        <div>
+          <div style={{fontSize:17,fontWeight:700,color:gold}}>✈ Hemingways Travel · BI Dashboard</div>
+          <div style={{fontSize:10,color:textMuted,marginTop:1}}>FY 2024 · Power BI · Azure Synapse · ETL Pipelines</div>
         </div>
-      );
-    }
+        <div style={{display:"flex",gap:10,alignItems:"center"}}>
+          <div style={{width:7,height:7,borderRadius:"50%",background:green,boxShadow:`0 0 8px ${green}`,animation:"pulse 1.5s infinite"}}/>
+          <div style={{fontSize:10,color:green,fontWeight:600}}>LIVE</div>
+          <button onClick={()=>setPlaying(p=>!p)}
+            style={{background:playing?gold:border,color:playing?navy:"#fff",border:"none",
+              borderRadius:6,padding:"5px 14px",fontSize:11,fontWeight:700,cursor:"pointer",marginLeft:8}}>
+            {playing?"⏸ Pause":"▶ Play"}
+          </button>
+        </div>
+      </div>
 
-    function Dashboard(){
-      const [tabIdx,setTabIdx]=useState(0);
-      const [visible,setVisible]=useState(true);
-      const [playing,setPlaying]=useState(true);
-      const [kpiActive,setKpiActive]=useState(false);
+      {/* Headline */}
+      <div style={{padding:"14px 24px 0",fontSize:14,fontWeight:600,color:"#fff",minHeight:28}}>
+        <TypingText text={headlines[tabIdx]} active={visible}/>
+      </div>
 
-      useEffect(()=>{setTimeout(()=>setKpiActive(true),400);},[]);
-
-      const goToTab=(i)=>{
-        setVisible(false);
-        setTimeout(()=>{setTabIdx(i);setVisible(true);setKpiActive(false);setTimeout(()=>setKpiActive(true),300);},400);
-      };
-
-      const nextTab=()=>{ if(!playing)return; goToTab((tabIdx+1)%tabs.length); };
-
-      return(
-        <div style={{background:navy,minHeight:"100vh",color:"#fff"}}>
-          <div style={{background:lightNavy,borderBottom:`1px solid ${border}`,padding:"14px 24px",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-            <div>
-              <div style={{fontSize:17,fontWeight:700,color:gold}}>✈ Hemingways Travel · BI Dashboard</div>
-              <div style={{fontSize:10,color:textMuted,marginTop:1}}>FY 2024 · Power BI · Azure Synapse · ETL Pipelines</div>
-            </div>
-            <div style={{display:"flex",gap:10,alignItems:"center"}}>
-              <div style={{width:7,height:7,borderRadius:"50%",background:green,boxShadow:`0 0 8px ${green}`,animation:"pulse 1.5s infinite"}}/>
-              <div style={{fontSize:10,color:green,fontWeight:600}}>LIVE</div>
-              <button onClick={()=>setPlaying(p=>!p)} style={{background:playing?gold:border,color:playing?navy:"#fff",border:"none",borderRadius:6,padding:"5px 14px",fontSize:11,fontWeight:700,cursor:"pointer",marginLeft:8}}>
-                {playing?"⏸ Pause":"▶ Play"}
-              </button>
-            </div>
+      {/* Tabs */}
+      <div style={{display:"flex",gap:4,padding:"10px 24px 0"}}>
+        {tabs.map((t,i)=>(
+          <div key={t} style={{flex:1}}>
+            <button onClick={()=>{setPlaying(false);goToTab(i);}}
+              style={{width:"100%",background:tabIdx===i?gold:"transparent",
+                color:tabIdx===i?navy:textMuted,
+                border:`1px solid ${tabIdx===i?gold:border}`,
+                borderRadius:"8px 8px 0 0",padding:"7px 0",
+                fontSize:11,fontWeight:700,cursor:"pointer",textTransform:"capitalize"}}>
+              {t}
+            </button>
+            {tabIdx===i&&playing&&
+              <TabTimer duration={tabDurations[i]} active={tabIdx===i&&playing} onComplete={nextTab}/>
+            }
           </div>
+        ))}
+      </div>
 
-          <div style={{padding:"14px 24px 0",fontSize:14,fontWeight:600,color:"#fff",minHeight:24}}>
-            <TypingText text={headlines[tabIdx]} active={visible}/>
+      <div style={{padding:"20px 24px"}}>
+
+        {/* KPIs */}
+        <div style={{display:"flex",gap:10,marginBottom:20,flexWrap:"wrap"}}>
+          {kpis.map((k,i)=><KPICard key={i} {...k} active={kpiActive}/>)}
+        </div>
+
+        {/* OVERVIEW */}
+        {tabIdx===0&&(
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16}}>
+            <Panel visible={visible}>
+              <SectionTitle title="Revenue Trend" sub="Before vs After BI ($K)"/>
+              <ResponsiveContainer width="100%" height={200}>
+                <AreaChart data={revenueData}>
+                  <defs>
+                    <linearGradient id="gA" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor={gold} stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor={gold} stopOpacity={0}/>
+                    </linearGradient>
+                    <linearGradient id="gB" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.2}/>
+                      <stop offset="95%" stopColor="#3B82F6" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke={border}/>
+                  <XAxis dataKey="month" tick={{fill:textMuted,fontSize:10}} axisLine={false}/>
+                  <YAxis tick={{fill:textMuted,fontSize:10}} axisLine={false} tickFormatter={v=>`$${v}K`}/>
+                  <Tooltip content={<CustomTooltip/>}/>
+                  <Area type="monotone" dataKey="before" name="Before" stroke="#3B82F6" fill="url(#gB)" strokeWidth={2}/>
+                  <Area type="monotone" dataKey="after" name="After BI" stroke={gold} fill="url(#gA)" strokeWidth={2.5}/>
+                </AreaChart>
+              </ResponsiveContainer>
+            </Panel>
+            <Panel visible={visible} style={{transitionDelay:"0.15s"}}>
+              <SectionTitle title="Booking Channels" sub="Revenue share by source"/>
+              <ResponsiveContainer width="100%" height={200}>
+                <PieChart>
+                  <Pie data={bookingChannels} cx="50%" cy="50%" innerRadius={50} outerRadius={80} dataKey="value" paddingAngle={3}>
+                    {bookingChannels.map((_,i)=><Cell key={i} fill={channelColors[i]}/>)}
+                  </Pie>
+                  <Tooltip formatter={v=>`${v}%`} contentStyle={{background:lightNavy,border:`1px solid ${border}`,borderRadius:8,fontSize:11}}/>
+                  <Legend wrapperStyle={{fontSize:10,color:textMuted}}/>
+                </PieChart>
+              </ResponsiveContainer>
+            </Panel>
+            <Panel visible={visible} style={{transitionDelay:"0.25s"}}>
+              <SectionTitle title="Cancellation Rate" sub="Monthly % decline"/>
+              <ResponsiveContainer width="100%" height={160}>
+                <LineChart data={cancellationData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke={border}/>
+                  <XAxis dataKey="month" tick={{fill:textMuted,fontSize:10}} axisLine={false}/>
+                  <YAxis tick={{fill:textMuted,fontSize:10}} axisLine={false} tickFormatter={v=>`${v}%`} domain={[4,22]}/>
+                  <Tooltip content={<CustomTooltip/>}/>
+                  <Line type="monotone" dataKey="rate" name="rate" stroke={red} strokeWidth={2.5} dot={{fill:red,r:3}}/>
+                </LineChart>
+              </ResponsiveContainer>
+            </Panel>
+            <Panel visible={visible} style={{transitionDelay:"0.35s"}}>
+              <SectionTitle title="Customer Segments" sub="Bookings vs Revenue"/>
+              <ResponsiveContainer width="100%" height={160}>
+                <BarChart data={customerSegments} barCategoryGap="30%">
+                  <CartesianGrid strokeDasharray="3 3" stroke={border}/>
+                  <XAxis dataKey="segment" tick={{fill:textMuted,fontSize:10}} axisLine={false}/>
+                  <YAxis tick={{fill:textMuted,fontSize:10}} axisLine={false}/>
+                  <Tooltip contentStyle={{background:lightNavy,border:`1px solid ${border}`,borderRadius:8,fontSize:11}}/>
+                  <Bar dataKey="bookings" name="Bookings" fill="#3B82F6" radius={[4,4,0,0]}/>
+                  <Bar dataKey="revenue" name="Revenue $K" fill={gold} radius={[4,4,0,0]}/>
+                </BarChart>
+              </ResponsiveContainer>
+            </Panel>
           </div>
+        )}
 
-          <div style={{display:"flex",gap:4,padding:"10px 24px 0"}}>
-            {tabs.map((t,i)=>(
-              <div key={t} style={{flex:1}}>
-                <button onClick={()=>{setPlaying(false);goToTab(i);}} style={{width:"100%",background:tabIdx===i?gold:"transparent",color:tabIdx===i?navy:textMuted,border:`1px solid ${tabIdx===i?gold:border}`,borderRadius:"8px 8px 0 0",padding:"7px 0",fontSize:11,fontWeight:700,cursor:"pointer",textTransform:"capitalize"}}>
-                  {t}
-                </button>
-                {tabIdx===i&&playing&&<TabTimer duration={tabDurations[i]} active={tabIdx===i&&playing} onComplete={nextTab}/>}
-              </div>
-            ))}
-          </div>
-
-          <div style={{padding:"20px 24px"}}>
-            <div style={{display:"flex",gap:10,marginBottom:20,flexWrap:"wrap"}}>
-              {kpis.map((k,i)=><KPICard key={i} {...k} active={kpiActive}/>)}
+        {/* REVENUE */}
+        {tabIdx===1&&(
+          <Panel visible={visible}>
+            <SectionTitle title="Full-Year Revenue Analysis" sub="Before vs After BI Implementation ($K)"/>
+            <ResponsiveContainer width="100%" height={340}>
+              <AreaChart data={revenueData}>
+                <defs>
+                  <linearGradient id="gA2" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor={gold} stopOpacity={0.35}/>
+                    <stop offset="95%" stopColor={gold} stopOpacity={0}/>
+                  </linearGradient>
+                  <linearGradient id="gB2" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.2}/>
+                    <stop offset="95%" stopColor="#3B82F6" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke={border}/>
+                <XAxis dataKey="month" tick={{fill:textMuted,fontSize:12}} axisLine={false}/>
+                <YAxis tick={{fill:textMuted,fontSize:12}} axisLine={false} tickFormatter={v=>`$${v}K`}/>
+                <Tooltip content={<CustomTooltip/>}/>
+                <Legend wrapperStyle={{fontSize:12,color:textMuted,paddingTop:12}}/>
+                <Area type="monotone" dataKey="before" name="Before" stroke="#3B82F6" fill="url(#gB2)" strokeWidth={2}/>
+                <Area type="monotone" dataKey="after" name="After BI" stroke={gold} fill="url(#gA2)" strokeWidth={3}/>
+              </AreaChart>
+            </ResponsiveContainer>
+            <div style={{marginTop:16,display:"flex",gap:16,flexWrap:"wrap"}}>
+              {[["Peak Month","Dec · $342K",gold],["Annual Growth","+12% YoY",green],["Best Month","Jul · +20%","#3B82F6"]].map(([l,v,c])=>(
+                <div key={l} style={{background:lightNavy,borderRadius:10,padding:"10px 18px",border:`1px solid ${border}`}}>
+                  <div style={{fontSize:10,color:textMuted}}>{l}</div>
+                  <div style={{fontSize:18,fontWeight:700,color:c}}>{v}</div>
+                </div>
+              ))}
             </div>
+          </Panel>
+        )}
 
-            {tabIdx===0&&(
-              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16}}>
-                <Panel visible={visible}>
-                  <SectionTitle title="Revenue Trend" sub="Before vs After BI ($K)"/>
-                  <ResponsiveContainer width="100%" height={200}>
-                    <AreaChart data={revenueData}>
-                      <defs>
-                        <linearGradient id="gA" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor={gold} stopOpacity={0.3}/><stop offset="95%" stopColor={gold} stopOpacity={0}/>
-                        </linearGradient>
-                        <linearGradient id="gB" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.2}/><stop offset="95%" stopColor="#3B82F6" stopOpacity={0}/>
-                        </linearGradient>
-                      </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke={border}/>
-                      <XAxis dataKey="month" tick={{fill:textMuted,fontSize:10}} axisLine={false}/>
-                      <YAxis tick={{fill:textMuted,fontSize:10}} axisLine={false} tickFormatter={v=>`$${v}K`}/>
-                      <Tooltip content={<CustomTooltip/>}/>
-                      <Area type="monotone" dataKey="before" name="Before" stroke="#3B82F6" fill="url(#gB)" strokeWidth={2}/>
-                      <Area type="monotone" dataKey="after" name="After BI" stroke={gold} fill="url(#gA)" strokeWidth={2.5}/>
-                    </AreaChart>
-                  </ResponsiveContainer>
-                </Panel>
-                <Panel visible={visible} style={{transitionDelay:"0.15s"}}>
-                  <SectionTitle title="Booking Channels" sub="Revenue share by source"/>
-                  <ResponsiveContainer width="100%" height={200}>
-                    <PieChart>
-                      <Pie data={bookingChannels} cx="50%" cy="50%" innerRadius={50} outerRadius={80} dataKey="value" paddingAngle={3}>
-                        {bookingChannels.map((_,i)=><Cell key={i} fill={channelColors[i]}/>)}
-                      </Pie>
-                      <Tooltip formatter={v=>`${v}%`} contentStyle={{background:lightNavy,border:`1px solid ${border}`,borderRadius:8,fontSize:11}}/>
-                      <Legend wrapperStyle={{fontSize:10,color:textMuted}}/>
-                    </PieChart>
-                  </ResponsiveContainer>
-                </Panel>
-                <Panel visible={visible} style={{transitionDelay:"0.25s"}}>
-                  <SectionTitle title="Cancellation Rate" sub="Monthly % decline"/>
-                  <ResponsiveContainer width="100%" height={160}>
-                    <LineChart data={cancellationData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke={border}/>
-                      <XAxis dataKey="month" tick={{fill:textMuted,fontSize:10}} axisLine={false}/>
-                      <YAxis tick={{fill:textMuted,fontSize:10}} axisLine={false} tickFormatter={v=>`${v}%`} domain={[4,22]}/>
-                      <Tooltip content={<CustomTooltip/>}/>
-                      <Line type="monotone" dataKey="rate" name="rate" stroke={red} strokeWidth={2.5} dot={{fill:red,r:3}}/>
-                    </LineChart>
-                  </ResponsiveContainer>
-                </Panel>
-                <Panel visible={visible} style={{transitionDelay:"0.35s"}}>
-                  <SectionTitle title="Customer Segments" sub="Bookings vs Revenue"/>
-                  <ResponsiveContainer width="100%" height={160}>
-                    <BarChart data={customerSegments} barCategoryGap="30%">
-                      <CartesianGrid strokeDasharray="3 3" stroke={border}/>
-                      <XAxis dataKey="segment" tick={{fill:textMuted,fontSize:10}} axisLine={false}/>
-                      <YAxis tick={{fill:textMuted,fontSize:10}} axisLine={false}/>
-                      <Tooltip contentStyle={{background:lightNavy,border:`1px solid ${border}`,borderRadius:8,fontSize:11}}/>
-                      <Bar dataKey="bookings" name="Bookings" fill="#3B82F6" radius={[4,4,0,0]}/>
-                      <Bar dataKey="revenue" name="Revenue $K" fill={gold} radius={[4,4,0,0]}/>
-                    </BarChart>
-                  </ResponsiveContainer>
-                </Panel>
-              </div>
-            )}
-
-            {tabIdx===1&&(
-              <Panel visible={visible}>
-                <SectionTitle title="Full-Year Revenue Analysis" sub="Before vs After BI Implementation ($K)"/>
-                <ResponsiveContainer width="100%" height={340}>
-                  <AreaChart data={revenueData}>
-                    <defs>
-                      <linearGradient id="gA2" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor={gold} stopOpacity={0.35}/><stop offset="95%" stopColor={gold} stopOpacity={0}/>
-                      </linearGradient>
-                      <linearGradient id="gB2" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.2}/><stop offset="95%" stopColor="#3B82F6" stopOpacity={0}/>
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke={border}/>
-                    <XAxis dataKey="month" tick={{fill:textMuted,fontSize:12}} axisLine={false}/>
-                    <YAxis tick={{fill:textMuted,fontSize:12}} axisLine={false} tickFormatter={v=>`$${v}K`}/>
-                    <Tooltip content={<CustomTooltip/>}/>
-                    <Legend wrapperStyle={{fontSize:12,color:textMuted,paddingTop:12}}/>
-                    <Area type="monotone" dataKey="before" name="Before" stroke="#3B82F6" fill="url(#gB2)" strokeWidth={2}/>
-                    <Area type="monotone" dataKey="after" name="After BI" stroke={gold} fill="url(#gA2)" strokeWidth={3}/>
-                  </AreaChart>
-                </ResponsiveContainer>
-                <div style={{marginTop:16,display:"flex",gap:16,flexWrap:"wrap"}}>
-                  {[["Peak Month","Dec · $342K",gold],["Annual Growth","+12% YoY",green],["Best Month","Jul · +20%","#3B82F6"]].map(([l,v,c])=>(
-                    <div key={l} style={{background:lightNavy,borderRadius:10,padding:"10px 18px",border:`1px solid ${border}`}}>
-                      <div style={{fontSize:10,color:textMuted}}>{l}</div>
-                      <div style={{fontSize:18,fontWeight:700,color:c}}>{v}</div>
-                    </div>
+        {/* CANCELLATIONS */}
+        {tabIdx===2&&(
+          <Panel visible={visible}>
+            <SectionTitle title="Cancellation Rate Reduction" sub="Monthly cancellation % — pricing & marketing strategy adjustments"/>
+            <ResponsiveContainer width="100%" height={320}>
+              <BarChart data={cancellationData}>
+                <CartesianGrid strokeDasharray="3 3" stroke={border}/>
+                <XAxis dataKey="month" tick={{fill:textMuted,fontSize:12}} axisLine={false}/>
+                <YAxis tick={{fill:textMuted,fontSize:12}} axisLine={false} tickFormatter={v=>`${v}%`} domain={[0,25]}/>
+                <Tooltip content={<CustomTooltip/>}/>
+                <Bar dataKey="rate" name="rate" radius={[6,6,0,0]}>
+                  {cancellationData.map((e,i)=>(
+                    <Cell key={i} fill={e.rate<=10?green:e.rate<=14?gold:red}/>
                   ))}
-                </div>
-              </Panel>
-            )}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+            <div style={{marginTop:12,fontSize:12,color:textMuted,display:"flex",gap:20}}>
+              <span><span style={{color:red}}>●</span> High (&gt;14%)</span>
+              <span><span style={{color:gold}}>●</span> Medium (11–14%)</span>
+              <span><span style={{color:green}}>●</span> Low (≤10%)</span>
+            </div>
+          </Panel>
+        )}
 
-            {tabIdx===2&&(
-              <Panel visible={visible}>
-                <SectionTitle title="Cancellation Rate Reduction" sub="Monthly cancellation % — pricing & marketing strategy adjustments"/>
-                <ResponsiveContainer width="100%" height={320}>
-                  <BarChart data={cancellationData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke={border}/>
-                    <XAxis dataKey="month" tick={{fill:textMuted,fontSize:12}} axisLine={false}/>
-                    <YAxis tick={{fill:textMuted,fontSize:12}} axisLine={false} tickFormatter={v=>`${v}%`} domain={[0,25]}/>
-                    <Tooltip content={<CustomTooltip/>}/>
-                    <Bar dataKey="rate" name="rate" radius={[6,6,0,0]}>
-                      {cancellationData.map((e,i)=>(
-                        <Cell key={i} fill={e.rate<=10?green:e.rate<=14?gold:red}/>
-                      ))}
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
-                <div style={{marginTop:12,fontSize:12,color:textMuted,display:"flex",gap:20}}>
-                  <span><span style={{color:red}}>●</span> High (&gt;14%)</span>
-                  <span><span style={{color:gold}}>●</span> Medium (11–14%)</span>
-                  <span><span style={{color:green}}>●</span> Low (≤10%)</span>
-                </div>
-              </Panel>
-            )}
-
-            {tabIdx===3&&(
-              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16}}>
-                <Panel visible={visible}>
-                  <SectionTitle title="Bookings by Segment" sub="Volume by customer type"/>
-                  <ResponsiveContainer width="100%" height={260}>
-                    <BarChart data={customerSegments} layout="vertical" barCategoryGap="25%">
-                      <CartesianGrid strokeDasharray="3 3" stroke={border} horizontal={false}/>
-                      <XAxis type="number" tick={{fill:textMuted,fontSize:11}} axisLine={false}/>
-                      <YAxis dataKey="segment" type="category" tick={{fill:"#fff",fontSize:12}} axisLine={false} width={80}/>
-                      <Tooltip contentStyle={{background:lightNavy,border:`1px solid ${border}`,borderRadius:8,fontSize:11}}/>
-                      <Bar dataKey="bookings" name="Bookings" fill="#3B82F6" radius={[0,6,6,0]}/>
-                    </BarChart>
-                  </ResponsiveContainer>
-                </Panel>
-                <Panel visible={visible} style={{transitionDelay:"0.15s"}}>
-                  <SectionTitle title="Revenue by Segment ($K)" sub="Highest value segments"/>
-                  <ResponsiveContainer width="100%" height={260}>
-                    <BarChart data={customerSegments} layout="vertical" barCategoryGap="25%">
-                      <CartesianGrid strokeDasharray="3 3" stroke={border} horizontal={false}/>
-                      <XAxis type="number" tick={{fill:textMuted,fontSize:11}} axisLine={false} tickFormatter={v=>`$${v}K`}/>
-                      <YAxis dataKey="segment" type="category" tick={{fill:"#fff",fontSize:12}} axisLine={false} width={80}/>
-                      <Tooltip contentStyle={{background:lightNavy,border:`1px solid ${border}`,borderRadius:8,fontSize:11}} formatter={v=>`$${v}K`}/>
-                      <Bar dataKey="revenue" name="Revenue" fill={gold} radius={[0,6,6,0]}/>
-                    </BarChart>
-                  </ResponsiveContainer>
-                </Panel>
-              </div>
-            )}
+        {/* SEGMENTS */}
+        {tabIdx===3&&(
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16}}>
+            <Panel visible={visible}>
+              <SectionTitle title="Bookings by Segment" sub="Volume by customer type"/>
+              <ResponsiveContainer width="100%" height={260}>
+                <BarChart data={customerSegments} layout="vertical" barCategoryGap="25%">
+                  <CartesianGrid strokeDasharray="3 3" stroke={border} horizontal={false}/>
+                  <XAxis type="number" tick={{fill:textMuted,fontSize:11}} axisLine={false}/>
+                  <YAxis dataKey="segment" type="category" tick={{fill:"#fff",fontSize:12}} axisLine={false} width={80}/>
+                  <Tooltip contentStyle={{background:lightNavy,border:`1px solid ${border}`,borderRadius:8,fontSize:11}}/>
+                  <Bar dataKey="bookings" name="Bookings" fill="#3B82F6" radius={[0,6,6,0]}/>
+                </BarChart>
+              </ResponsiveContainer>
+            </Panel>
+            <Panel visible={visible} style={{transitionDelay:"0.15s"}}>
+              <SectionTitle title="Revenue by Segment ($K)" sub="Highest value segments"/>
+              <ResponsiveContainer width="100%" height={260}>
+                <BarChart data={customerSegments} layout="vertical" barCategoryGap="25%">
+                  <CartesianGrid strokeDasharray="3 3" stroke={border} horizontal={false}/>
+                  <XAxis type="number" tick={{fill:textMuted,fontSize:11}} axisLine={false} tickFormatter={v=>`$${v}K`}/>
+                  <YAxis dataKey="segment" type="category" tick={{fill:"#fff",fontSize:12}} axisLine={false} width={80}/>
+                  <Tooltip contentStyle={{background:lightNavy,border:`1px solid ${border}`,borderRadius:8,fontSize:11}} formatter={v=>`$${v}K`}/>
+                  <Bar dataKey="revenue" name="Revenue" fill={gold} radius={[0,6,6,0]}/>
+                </BarChart>
+              </ResponsiveContainer>
+            </Panel>
           </div>
+        )}
+      </div>
 
-          <div style={{padding:"10px 24px",borderTop:`1px solid ${border}`,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-            <div style={{fontSize:10,color:textMuted}}>Power BI · Azure Synapse · Automated ETL Pipelines · Python · SQL</div>
-            <div style={{fontSize:10,color:gold}}>Jimmy Maina · jimal254.github.io</div>
-          </div>
-        </div>
-      );
-    }
+      {/* Footer */}
+      <div style={{padding:"10px 24px",borderTop:`1px solid ${border}`,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+        <div style={{fontSize:10,color:textMuted}}>Power BI · Azure Synapse · Automated ETL Pipelines · Python · SQL</div>
+        <div style={{fontSize:10,color:gold}}>Jimmy Maina · jimal254.github.io</div>
+      </div>
 
-    ReactDOM.render(<Dashboard/>, document.getElementById('root'));
-  </script>
+    </div>
+  );
+}
+
+ReactDOM.render(React.createElement(Dashboard,null), document.getElementById('root'));
+</script>
 </body>
-</html>
+  </html>
